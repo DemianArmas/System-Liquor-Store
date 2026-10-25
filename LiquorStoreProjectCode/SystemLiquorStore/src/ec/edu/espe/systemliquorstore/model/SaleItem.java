@@ -9,7 +9,7 @@ public class SaleItem {
     private final int quantity;
     private final double unitPurchaseCost;
     private final double unitSellingPrice;
-    private final Validation validation = new Validation();
+    private static final Validation validation = new Validation();
 
     public SaleItem(String productCode, String productName, int quantity,
             double unitPurchaseCost, double unitSellingPrice) {

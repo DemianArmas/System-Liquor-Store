@@ -18,7 +18,7 @@ public class Sale {
     private double totalAmount;
     private boolean ageVerified;
     private boolean completed;
-    private final Validation validation = new Validation();
+    private static final Validation validation = new Validation();
 
     public Sale(int saleId, String date, String seller, String paymentType) {
         if (saleId <= 0 || !validation.isValidDate(date)

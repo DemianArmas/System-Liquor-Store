@@ -6,7 +6,7 @@ public class Supplier {
     private final int supplierId;
     private String name;
     private String contact;
-    private final Validation validation = new Validation();
+    private static final Validation validation = new Validation();
 
     public Supplier(int supplierId, String name, String contact) {
         this.supplierId = supplierId;

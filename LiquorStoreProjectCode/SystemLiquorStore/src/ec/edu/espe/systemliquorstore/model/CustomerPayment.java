@@ -7,7 +7,7 @@ public class CustomerPayment {
     private final int customerId;
     private final String date;
     private final double amount;
-    private final Validation validation = new Validation();
+    private static final Validation validation = new Validation();
 
     public CustomerPayment(int paymentId, int customerId, String date, double amount) {
         if (paymentId <= 0 || customerId <= 0 || !validation.isValidDate(date)

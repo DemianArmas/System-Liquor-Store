@@ -10,7 +10,7 @@ public class PurchaseOrder {
     private String status;
     private String receivedDate;
     private final ArrayList<PurchaseOrderItem> items;
-    private final Validation validation = new Validation();
+    private static final Validation validation = new Validation();
 
     public PurchaseOrder(int orderId, int supplierId, String orderDate) {
         if (orderId <= 0 || supplierId <= 0 || !validation.isValidDate(orderDate)) {

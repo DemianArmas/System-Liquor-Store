@@ -1,0 +1,27 @@
+{
+  "products": [
+    {
+      "productCode": "1",
+      "name": "Cuningham",
+      "purchaseCost": 5.75,
+      "sellingPrice": 6.9,
+      "stock": 3,
+      "minimumStock": 2
+    }
+  ],
+  "movements": [
+    {
+      "movementId": 1,
+      "date": "2026-10-25",
+      "productCode": "1",
+      "movementType": "ENTRY",
+      "quantity": 3
+    }
+  ],
+  "suppliers": [],
+  "orders": [],
+  "sales": [],
+  "customers": [],
+  "payments": [],
+  "cashRecords": []
+}

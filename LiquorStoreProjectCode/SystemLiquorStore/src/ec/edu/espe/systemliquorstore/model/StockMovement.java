@@ -9,7 +9,7 @@ public class StockMovement {
     private final String productCode;
     private final String movementType;
     private final int quantity;
-    private final Validation validation = new Validation();
+    private static final Validation validation = new Validation();
 
     public StockMovement(int movementId, String date, String productCode,
             String movementType, int quantity) {

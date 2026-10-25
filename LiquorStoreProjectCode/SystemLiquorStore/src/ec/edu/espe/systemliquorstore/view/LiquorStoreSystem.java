@@ -1,14 +1,23 @@
 package ec.edu.espe.systemliquorstore.view;
 
 import ec.edu.espe.systemliquorstore.model.*;
+import ec.edu.espe.systemliquorstore.util.Jsonstorage;
+import ec.edu.espe.systemliquorstore.util.Storedata;
 import ec.edu.espe.systemliquorstore.util.Validation;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Scanner;
 
+/**
+ *
+ * @author Demian Armas, Enrique Ayala, Issac Acurio, LogicLords,@ESPE
+ */
+
 public class LiquorStoreSystem {
     private final Scanner scanner = new Scanner(System.in, "UTF-8");
+    private final Jsonstorage storage = new Jsonstorage("data/liquorstore.json");
     private final Validation validation = new Validation();
     private final ArrayList<Product> products = new ArrayList<>();
     private final ArrayList<StockMovement> movements = new ArrayList<>();
@@ -31,38 +40,136 @@ public class LiquorStoreSystem {
 
     public void run() {
         System.out.println("SISTEMA DE LICORERÍA");
-        System.out.println("Los datos se conservan únicamente mientras el programa está abierto.");
+        System.out.println("Los datos se guardan automáticamente en data/liquorstore.json.");
         System.out.println("Escriba /cancelar para abandonar una operación y volver al menú principal.");
+        if (!loadData()) {
+            scanner.close();
+            return;
+        }
         while (running) {
             try {
                 showMainMenu();
                 int option = readInt("Opción: ", 0, 10);
                 switch (option) {
-                    case 1: productsMenu(); break;
-                    case 2: showLowStockAlerts(); break;
-                    case 3: suppliersMenu(); break;
-                    case 4: registerSale(); break;
-                    case 5: customersMenu(); break;
-                    case 6: cashMenu(); break;
-                    case 7: showProfitReport(); break;
-                    case 8: showSalesReport(); break;
-                    case 9: showBestSellers(); break;
-                    case 10: loadDemoData(); break;
+                    case 1:
+                        productsMenu();
+                        break;
+                    case 2:
+                        showLowStockAlerts();
+                        break;
+                    case 3:
+                        suppliersMenu();
+                        break;
+                    case 4:
+                        registerSale();
+                        break;
+                    case 5:
+                        customersMenu();
+                        break;
+                    case 6:
+                        cashMenu();
+                        break;
+                    case 7:
+                        showProfitReport();
+                        break;
+                    case 8:
+                        showSalesReport();
+                        break;
+                    case 9:
+                        showBestSellers();
+                        break;
+                    case 10:
+                        loadDemoData();
+                        break;
                     case 0:
-                        if (readYesNo("Los datos de la sesión se borrarán. ¿Desea salir? (s/n): ")) {
+                        if (readYesNo("¿Desea salir? (s/n): ")) {
                             running = false;
                         }
                         break;
-                    default: break;
+                    default:
+                        break;
                 }
             } catch (IllegalArgumentException exception) {
                 System.out.println("No se pudo realizar la operación: " + exception.getMessage());
             } catch (IllegalStateException exception) {
                 System.out.println(exception.getMessage());
             }
+            saveData();
         }
         System.out.println("Programa finalizado.");
         scanner.close();
+    }
+
+    private boolean loadData() {
+        if (!storage.exists()) {
+            System.out.println("No hay datos guardados. Se inicia con registros vacíos.");
+            return true;
+        }
+        try {
+            Storedata data = storage.load();
+            products.addAll(data.getProducts());
+            movements.addAll(data.getMovements());
+            suppliers.addAll(data.getSuppliers());
+            orders.addAll(data.getOrders());
+            sales.addAll(data.getSales());
+            customers.addAll(data.getCustomers());
+            payments.addAll(data.getPayments());
+            cashRecords.addAll(data.getCashRecords());
+            refreshCounters();
+            System.out.println("Datos cargados desde " + storage.getFilePath());
+            return true;
+        } catch (IOException exception) {
+            System.out.println("No se pudo leer el archivo de datos: " + exception.getMessage());
+            try {
+                System.out.println("Se guardó una copia del archivo dañado en " + storage.backupDamagedFile());
+                System.out.println("Se inicia con registros vacíos.");
+                return true;
+            } catch (IOException backupException) {
+                System.out.println("No se pudo respaldar el archivo. Corríjalo o elimínelo e intente de nuevo.");
+                return false;
+            }
+        }
+    }
+
+    private void saveData() {
+        try {
+            storage.save(new Storedata(products, movements, suppliers, orders, sales, customers, payments, cashRecords));
+        } catch (IOException exception) {
+            System.out.println("No se pudo guardar el archivo de datos: " + exception.getMessage());
+        }
+    }
+
+    private void refreshCounters() {
+        nextSupplierId = 1;
+        for (Supplier supplier : suppliers) {
+            if (supplier.getSupplierId() >= nextSupplierId) {
+                nextSupplierId = supplier.getSupplierId() + 1;
+            }
+        }
+        nextOrderId = 1;
+        for (PurchaseOrder order : orders) {
+            if (order.getOrderId() >= nextOrderId) {
+                nextOrderId = order.getOrderId() + 1;
+            }
+        }
+        nextSaleId = 1;
+        for (Sale sale : sales) {
+            if (sale.getSaleId() >= nextSaleId) {
+                nextSaleId = sale.getSaleId() + 1;
+            }
+        }
+        nextCustomerId = 1;
+        for (Customer customer : customers) {
+            if (customer.getCustomerId() >= nextCustomerId) {
+                nextCustomerId = customer.getCustomerId() + 1;
+            }
+        }
+        nextPaymentId = 1;
+        for (CustomerPayment payment : payments) {
+            if (payment.getPaymentId() >= nextPaymentId) {
+                nextPaymentId = payment.getPaymentId() + 1;
+            }
+        }
     }
 
     private void showMainMenu() {
@@ -93,14 +200,28 @@ public class LiquorStoreSystem {
             System.out.println("0. Volver");
             option = readInt("Opción: ", 0, 6);
             switch (option) {
-                case 1: registerProduct(); break;
-                case 2: showProducts(); break;
-                case 3: updateProduct(); break;
-                case 4: recordStockMovement(true); break;
-                case 5: recordStockMovement(false); break;
-                case 6: showMovements(); break;
-                default: break;
+                case 1:
+                    registerProduct();
+                    break;
+                case 2:
+                    showProducts();
+                    break;
+                case 3:
+                    updateProduct();
+                    break;
+                case 4:
+                    recordStockMovement(true);
+                    break;
+                case 5:
+                    recordStockMovement(false);
+                    break;
+                case 6:
+                    showMovements();
+                    break;
+                default:
+                    break;
             }
+            saveData();
         } while (option != 0 && running);
     }
 
@@ -120,8 +241,7 @@ public class LiquorStoreSystem {
             System.out.println("Registro cancelado.");
             return;
         }
-        StockMovement movement = stock > 0
-                ? product.createStockMovement(nextMovementId(), date, "ENTRY", stock) : null;
+        StockMovement movement = stock > 0 ? product.createStockMovement(nextMovementId(), date, "ENTRY", stock) : null;
         products.add(product);
         if (movement != null) {
             movements.add(movement);
@@ -135,13 +255,10 @@ public class LiquorStoreSystem {
             System.out.println("Todavía no hay productos registrados.");
             return;
         }
-        System.out.printf("%-12s %-30s %12s %12s %10s %10s%n",
-                "Código", "Producto", "Costo USD", "P.V.P. USD", "Stock", "Mínimo");
+        System.out.printf("%-12s %-30s %12s %12s %10s %10s%n", "Código", "Producto", "Costo USD", "P.V.P. USD", "Stock", "Mínimo");
         for (Product product : products) {
-            System.out.printf(Locale.US, "%-12s %-30.30s %12.2f %12.2f %10d %10d%n",
-                    product.getProductCode(), product.getName(), product.getPurchaseCost(),
-                    product.getSellingPrice(), product.getStock(), product.getMinimumStock());
-                    showProductAlert(product);
+            System.out.printf(Locale.US, "%-12s %-30.30s %12.2f %12.2f %10d %10d%n", product.getProductCode(), product.getName(), product.getPurchaseCost(), product.getSellingPrice(), product.getStock(), product.getMinimumStock());
+            showProductAlert(product);
         }
     }
 
@@ -169,8 +286,7 @@ public class LiquorStoreSystem {
         if (!entry && quantity > product.getStock()) {
             throw new IllegalArgumentException("Stock insuficiente. Disponible: " + product.getStock());
         }
-        StockMovement movement = product.createStockMovement(nextMovementId(), date,
-                entry ? "ENTRY" : "EXIT", quantity);
+        StockMovement movement = product.createStockMovement(nextMovementId(), date, entry ? "ENTRY" : "EXIT", quantity);
         if (!readYesNo("¿Confirmar movimiento? (s/n): ")) {
             System.out.println("Movimiento cancelado.");
             return;
@@ -192,9 +308,7 @@ public class LiquorStoreSystem {
         }
         System.out.printf("%-8s %-12s %-14s %-12s %12s%n", "ID", "Fecha", "Código", "Tipo", "Cantidad");
         for (StockMovement movement : movements) {
-            System.out.printf("%-8d %-12s %-14s %-12s %12d%n", movement.getMovementId(),
-                    movement.getDate(), movement.getProductCode(),
-                    "ENTRY".equals(movement.getMovementType()) ? "Entrada" : "Salida", movement.getQuantity());
+            System.out.printf("%-8d %-12s %-14s %-12s %12d%n", movement.getMovementId(), movement.getDate(), movement.getProductCode(), "ENTRY".equals(movement.getMovementType()) ? "Entrada" : "Salida", movement.getQuantity());
         }
     }
 
@@ -218,8 +332,7 @@ public class LiquorStoreSystem {
 
     private void showProductAlert(Product product) {
         if (product.isLowStock()) {
-            System.out.println("ALERTA: " + product.getProductCode() + " - " + product.getName()
-                    + ". Stock: " + product.getStock() + ", mínimo: " + product.getMinimumStock());
+            System.out.println("ALERTA: " + product.getProductCode() + " - " + product.getName() + ". Stock: " + product.getStock() + ", mínimo: " + product.getMinimumStock());
         }
     }
 
@@ -235,13 +348,25 @@ public class LiquorStoreSystem {
             System.out.println("0. Volver");
             option = readInt("Opción: ", 0, 5);
             switch (option) {
-                case 1: registerSupplier(); break;
-                case 2: showSuppliers(); break;
-                case 3: createOrder(); break;
-                case 4: showOrders(); break;
-                case 5: receiveOrder(); break;
-                default: break;
+                case 1:
+                    registerSupplier();
+                    break;
+                case 2:
+                    showSuppliers();
+                    break;
+                case 3:
+                    createOrder();
+                    break;
+                case 4:
+                    showOrders();
+                    break;
+                case 5:
+                    receiveOrder();
+                    break;
+                default:
+                    break;
             }
+            saveData();
         } while (option != 0 && running);
     }
 
@@ -320,16 +445,13 @@ public class LiquorStoreSystem {
 
     private void printOrder(PurchaseOrder order) {
         Supplier supplier = findSupplier(order.getSupplierId());
-        System.out.println("\nPedido " + order.getOrderId() + " | Fecha: " + order.getOrderDate()
-                + " | Proveedor: " + (supplier == null ? order.getSupplierId() : supplier.getName())
-                + " | Estado: " + (order.isPending() ? "Pendiente" : "Recibido"));
+        System.out.println("\nPedido " + order.getOrderId() + " | Fecha: " + order.getOrderDate() + " | Proveedor: " + (supplier == null ? order.getSupplierId() : supplier.getName()) + " | Estado: " + (order.isPending() ? "Pendiente" : "Recibido"));
         if (!order.isPending()) {
             System.out.println("Fecha de recepción: " + order.getReceivedDate());
         }
         for (PurchaseOrderItem item : order.getItems()) {
             Product product = findProduct(item.getProductCode());
-            System.out.println("  " + item.getProductCode() + " - "
-                    + (product == null ? "Producto" : product.getName()) + ": " + item.getQuantity() + " unidades");
+            System.out.println("  " + item.getProductCode() + " - " + (product == null ? "Producto" : product.getName()) + ": " + item.getQuantity() + " unidades");
         }
     }
 
@@ -393,8 +515,7 @@ public class LiquorStoreSystem {
             int quantity = readInt("Cantidad: ", 1, Integer.MAX_VALUE);
             long requested = (long) sale.getProductQuantity(product.getProductCode()) + quantity;
             if (requested > product.getStock()) {
-                System.out.println("Stock insuficiente. Disponible: " + product.getStock()
-                        + ". Ya añadido a esta venta: " + sale.getProductQuantity(product.getProductCode()));
+                System.out.println("Stock insuficiente. Disponible: " + product.getStock() + ". Ya añadido a esta venta: " + sale.getProductQuantity(product.getProductCode()));
                 continue;
             }
             sale.addProduct(product, quantity);
@@ -437,8 +558,7 @@ public class LiquorStoreSystem {
         printSale(sale);
         if (credit) {
             Customer customer = findCustomer(sale.getCustomerId());
-            System.out.printf(Locale.US, "Saldo pendiente de %s: %.2f USD%n", customer.getName(),
-                    customer.getOutstandingBalance(sales, payments));
+            System.out.printf(Locale.US, "Saldo pendiente de %s: %.2f USD%n", customer.getName(), customer.getOutstandingBalance(sales, payments));
             System.out.println("La venta a crédito no aumenta el efectivo de caja hasta recibir un pago.");
         }
         showLowStockAlerts();
@@ -446,20 +566,17 @@ public class LiquorStoreSystem {
 
     private void printSale(Sale sale) {
         System.out.println("\n--- RESUMEN DE VENTA " + sale.getSaleId() + " ---");
-        System.out.println("Fecha: " + sale.getDate() + " | Vendedor: " + sellerLabel(sale.getSeller())
-                + " | Pago: " + paymentLabel(sale.getPaymentType()));
+        System.out.println("Fecha: " + sale.getDate() + " | Vendedor: " + sellerLabel(sale.getSeller()) + " | Pago: " + paymentLabel(sale.getPaymentType()));
         if (sale.getCustomerId() > 0) {
             Customer customer = findCustomer(sale.getCustomerId());
             System.out.println("Cliente: " + (customer == null ? sale.getCustomerId() : customer.getName()));
         }
         System.out.printf("%-12s %-28s %8s %12s %12s%n", "Código", "Producto", "Cantidad", "Precio USD", "Importe USD");
         for (SaleItem item : sale.getItems()) {
-            System.out.printf(Locale.US, "%-12s %-28.28s %8d %12.2f %12.2f%n", item.getProductCode(),
-                    item.getProductName(), item.getQuantity(), item.getUnitSellingPrice(), item.calculateSubtotal());
+            System.out.printf(Locale.US, "%-12s %-28.28s %8d %12.2f %12.2f%n", item.getProductCode(), item.getProductName(), item.getQuantity(), item.getUnitSellingPrice(), item.calculateSubtotal());
         }
         System.out.printf(Locale.US, "Subtotal: %.2f USD%n", sale.calculateSubtotal());
-        System.out.printf(Locale.US, "Descuento: %.2f %% | Importe descontado: %.2f USD%n",
-                sale.getDiscountPercentage(), sale.getDiscountAmount());
+        System.out.printf(Locale.US, "Descuento: %.2f %% | Importe descontado: %.2f USD%n", sale.getDiscountPercentage(), sale.getDiscountAmount());
         System.out.printf(Locale.US, "TOTAL: %.2f USD%n", sale.calculateTotal());
     }
 
@@ -474,12 +591,22 @@ public class LiquorStoreSystem {
             System.out.println("0. Volver");
             option = readInt("Opción: ", 0, 4);
             switch (option) {
-                case 1: registerCustomer(); break;
-                case 2: showCustomers(); break;
-                case 3: showCustomerHistory(); break;
-                case 4: registerCustomerPayment(); break;
-                default: break;
+                case 1:
+                    registerCustomer();
+                    break;
+                case 2:
+                    showCustomers();
+                    break;
+                case 3:
+                    showCustomerHistory();
+                    break;
+                case 4:
+                    registerCustomerPayment();
+                    break;
+                default:
+                    break;
             }
+            saveData();
         } while (option != 0 && running);
     }
 
@@ -501,8 +628,7 @@ public class LiquorStoreSystem {
         }
         System.out.printf("%-8s %-35s %15s%n", "ID", "Cliente", "Deuda USD");
         for (Customer customer : customers) {
-            System.out.printf(Locale.US, "%-8d %-35.35s %15.2f%n", customer.getCustomerId(), customer.getName(),
-                    customer.getOutstandingBalance(sales, payments));
+            System.out.printf(Locale.US, "%-8d %-35.35s %15.2f%n", customer.getCustomerId(), customer.getName(), customer.getOutstandingBalance(sales, payments));
         }
     }
 
@@ -511,8 +637,7 @@ public class LiquorStoreSystem {
         System.out.println("\nCompras a crédito de " + customer.getName() + ":");
         boolean hasSales = false;
         for (Sale sale : sales) {
-            if (sale.isCompleted() && "CREDIT".equals(sale.getPaymentType())
-                    && sale.getCustomerId() == customer.getCustomerId()) {
+            if (sale.isCompleted() && "CREDIT".equals(sale.getPaymentType()) && sale.getCustomerId() == customer.getCustomerId()) {
                 printSale(sale);
                 hasSales = true;
             }
@@ -524,8 +649,7 @@ public class LiquorStoreSystem {
         boolean hasPayments = false;
         for (CustomerPayment payment : payments) {
             if (payment.getCustomerId() == customer.getCustomerId()) {
-                System.out.printf(Locale.US, "Pago %d | %s | %.2f USD%n", payment.getPaymentId(),
-                        payment.getDate(), payment.getAmount());
+                System.out.printf(Locale.US, "Pago %d | %s | %.2f USD%n", payment.getPaymentId(), payment.getDate(), payment.getAmount());
                 hasPayments = true;
             }
         }
@@ -555,8 +679,7 @@ public class LiquorStoreSystem {
         if (readYesNo("¿Registrar el pago recibido? (s/n): ")) {
             customer.registerPayment(payment, sales, payments);
             nextPaymentId++;
-            System.out.printf(Locale.US, "Pago registrado. Saldo pendiente: %.2f USD%n",
-                    customer.getOutstandingBalance(sales, payments));
+            System.out.printf(Locale.US, "Pago registrado. Saldo pendiente: %.2f USD%n", customer.getOutstandingBalance(sales, payments));
         } else {
             System.out.println("Pago cancelado.");
         }
@@ -574,13 +697,25 @@ public class LiquorStoreSystem {
             System.out.println("0. Volver");
             option = readInt("Opción: ", 0, 5);
             switch (option) {
-                case 1: openCash(); break;
-                case 2: registerExpense(); break;
-                case 3: recordCashCount(); break;
-                case 4: showCashReport(selectCashRecord()); break;
-                case 5: showCashDates(); break;
-                default: break;
+                case 1:
+                    openCash();
+                    break;
+                case 2:
+                    registerExpense();
+                    break;
+                case 3:
+                    recordCashCount();
+                    break;
+                case 4:
+                    showCashReport(selectCashRecord());
+                    break;
+                case 5:
+                    showCashDates();
+                    break;
+                default:
+                    break;
             }
+            saveData();
         } while (option != 0 && running);
     }
 
@@ -628,8 +763,7 @@ public class LiquorStoreSystem {
             return;
         }
         for (DailyCashRecord record : cashRecords) {
-            System.out.printf(Locale.US, "%s | Apertura: %.2f USD | Conteo: %s%n", record.getDate(),
-                    record.getOpeningCash(), record.isCashCountRecorded() ? "Registrado" : "Pendiente");
+            System.out.printf(Locale.US, "%s | Apertura: %.2f USD | Conteo: %s%n", record.getDate(), record.getOpeningCash(), record.isCashCountRecorded() ? "Registrado" : "Pendiente");
         }
     }
 
@@ -684,8 +818,7 @@ public class LiquorStoreSystem {
                 for (SaleItem item : sale.getItems()) {
                     cost += item.calculatePurchaseCost();
                 }
-                System.out.printf(Locale.US, "Venta %d | %s | Importe: %.2f USD | Ganancia: %.2f USD | Margen: %.2f %%%n",
-                        sale.getSaleId(), sale.getDate(), sale.getTotalAmount(), sale.calculateGrossProfit(), sale.calculateMargin());
+                System.out.printf(Locale.US, "Venta %d | %s | Importe: %.2f USD | Ganancia: %.2f USD | Margen: %.2f %%%n", sale.getSaleId(), sale.getDate(), sale.getTotalAmount(), sale.calculateGrossProfit(), sale.calculateMargin());
                 totalRevenue += sale.getTotalAmount();
                 totalCost += cost;
                 count++;
@@ -698,8 +831,7 @@ public class LiquorStoreSystem {
         totalRevenue = validation.roundMoney(totalRevenue);
         totalCost = validation.roundMoney(totalCost);
         double profit = validation.roundMoney(totalRevenue - totalCost);
-        System.out.printf(Locale.US, "Total vendido: %.2f USD | Costo: %.2f USD | GANANCIA BRUTA: %.2f USD%n",
-                totalRevenue, totalCost, profit);
+        System.out.printf(Locale.US, "Total vendido: %.2f USD | Costo: %.2f USD | GANANCIA BRUTA: %.2f USD%n", totalRevenue, totalCost, profit);
         System.out.printf(Locale.US, "MARGEN GLOBAL: %.2f %%%n", validation.roundMoney(profit / totalRevenue * 100));
         System.out.println("El margen mostrado es el real; el 20% es una referencia y no modifica los precios de etiqueta.");
         System.out.println("La ganancia bruta no descuenta los gastos de operación de la tienda.");
@@ -713,8 +845,7 @@ public class LiquorStoreSystem {
         int count = 0;
         double total = 0;
         for (Sale sale : sales) {
-            boolean sellerMatches = filter == 0 || (filter == 1 && "OWNER".equals(sale.getSeller()))
-                    || (filter == 2 && "EMPLOYEE".equals(sale.getSeller()));
+            boolean sellerMatches = filter == 0 || (filter == 1 && "OWNER".equals(sale.getSeller())) || (filter == 2 && "EMPLOYEE".equals(sale.getSeller()));
             if (sale.isCompleted() && sellerMatches && inRange(sale.getDate(), start, end)) {
                 printSale(sale);
                 total += sale.getTotalAmount();
@@ -724,8 +855,7 @@ public class LiquorStoreSystem {
         if (count == 0) {
             System.out.println("No hay ventas que coincidan con el vendedor y las fechas seleccionadas.");
         } else {
-            System.out.printf(Locale.US, "Ventas encontradas: %d | Total vendido: %.2f USD%n",
-                    count, validation.roundMoney(total));
+            System.out.printf(Locale.US, "Ventas encontradas: %d | Total vendido: %.2f USD%n", count, validation.roundMoney(total));
         }
     }
 
@@ -747,8 +877,7 @@ public class LiquorStoreSystem {
         }
         for (int i = 0; i < ranked.size() - 1; i++) {
             for (int j = i + 1; j < ranked.size(); j++) {
-                if (units[j] > units[i] || (units[j] == units[i]
-                        && ranked.get(j).getProductCode().compareTo(ranked.get(i).getProductCode()) < 0)) {
+                if (units[j] > units[i] || (units[j] == units[i] && ranked.get(j).getProductCode().compareTo(ranked.get(i).getProductCode()) < 0)) {
                     int savedUnits = units[i];
                     units[i] = units[j];
                     units[j] = savedUnits;
@@ -762,15 +891,13 @@ public class LiquorStoreSystem {
         System.out.printf("%-8s %-12s %-35s %12s%n", "Puesto", "Código", "Producto", "Unidades");
         for (int i = 0; i < ranked.size(); i++) {
             Product product = ranked.get(i);
-            System.out.printf("%-8d %-12s %-35.35s %12d%n",
-                    i + 1, product.getProductCode(), product.getName(), units[i]);
+            System.out.printf("%-8d %-12s %-35.35s %12d%n", i + 1, product.getProductCode(), product.getName(), units[i]);
         }
         System.out.println("Incluye ventas de contado y a crédito. Los pagos de deudas no cuentan como nuevas ventas.");
     }
 
     private void loadDemoData() {
-        if (!products.isEmpty() || !suppliers.isEmpty() || !orders.isEmpty() || !sales.isEmpty()
-                || !customers.isEmpty() || !payments.isEmpty() || !cashRecords.isEmpty() || !movements.isEmpty()) {
+        if (!products.isEmpty() || !suppliers.isEmpty() || !orders.isEmpty() || ! sales.isEmpty() || !customers.isEmpty() || !payments.isEmpty() || !cashRecords.isEmpty() || ! movements.isEmpty()) {
             throw new IllegalStateException("La demostración solo se carga al iniciar con todos los registros vacíos.");
         }
         if (!readYesNo("¿Cargar productos, un proveedor y un cliente ficticios? (s/n): ")) {
@@ -937,9 +1064,7 @@ public class LiquorStoreSystem {
                 if (validation.isMoney(value) && (value > 0 || (allowZero && value == 0))) {
                     return value;
                 }
-                System.out.println(allowZero
-                        ? "Ingrese un monto no negativo con hasta dos decimales."
-                        : "Ingrese un monto mayor que cero con hasta dos decimales.");
+                System.out.println(allowZero ? "Ingrese un monto no negativo con hasta dos decimales." : "Ingrese un monto mayor que cero con hasta dos decimales.");
             } catch (NumberFormatException exception) {
                 System.out.println("Ingrese un número válido. Ejemplo: 8.50");
             }

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class Customer {
     private final int customerId;
     private String name;
-    private final Validation validation = new Validation();
+    private static final Validation validation = new Validation();
 
     public Customer(int customerId, String name) {
         if (customerId <= 0 || !validation.isText(name)) {

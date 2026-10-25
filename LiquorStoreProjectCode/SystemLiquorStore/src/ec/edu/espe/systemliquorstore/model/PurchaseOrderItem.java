@@ -6,7 +6,7 @@ import java.util.Locale;
 public class PurchaseOrderItem {
     private final String productCode;
     private final int quantity;
-    private final Validation validation = new Validation();
+    private static final Validation validation = new Validation();
 
     public PurchaseOrderItem(String productCode, int quantity) {
         this.productCode = productCode == null ? "" : productCode.trim().toUpperCase(Locale.ROOT);

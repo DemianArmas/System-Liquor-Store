@@ -9,7 +9,7 @@ public class DailyCashRecord {
     private double countedCash;
     private boolean cashCountRecorded;
     private final ArrayList<CashExpense> expenses;
-    private final Validation validation = new Validation();
+    private static final Validation validation = new Validation();
 
     public DailyCashRecord(String date, double openingCash) {
         if (!validation.isValidDate(date) || !validation.isMoney(openingCash) || openingCash < 0) {

@@ -5,7 +5,7 @@ import ec.edu.espe.systemliquorstore.util.Validation;
 public class CashExpense {
     private final String description;
     private final double amount;
-    private final Validation validation = new Validation();
+    private static final Validation validation = new Validation();
 
     public CashExpense(String description, double amount) {
         if (!validation.isText(description) || !validation.isMoney(amount) || amount <= 0) {

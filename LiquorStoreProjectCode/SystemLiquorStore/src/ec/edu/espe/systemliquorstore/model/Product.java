@@ -11,7 +11,7 @@ public class Product {
     private double sellingPrice;
     private int stock;
     private int minimumStock;
-    private final Validation validation = new Validation();
+    private static final Validation validation = new Validation();
 
     public Product(String productCode, String name, double purchaseCost,
             double sellingPrice, int stock, int minimumStock) {
