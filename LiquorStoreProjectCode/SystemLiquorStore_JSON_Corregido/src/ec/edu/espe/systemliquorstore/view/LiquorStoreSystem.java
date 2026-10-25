@@ -10,11 +10,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Scanner;
 
-/**
- *
- * @author Demian Armas, Enrique Ayala, Issac Acurio, LogicLords,@ESPE
- */
-
 public class LiquorStoreSystem {
     private final Scanner scanner = new Scanner(System.in, "UTF-8");
     private final Jsonstorage storage = new Jsonstorage("data/liquorstore.json");
@@ -33,6 +28,7 @@ public class LiquorStoreSystem {
     private int nextCustomerId = 1;
     private int nextPaymentId = 1;
     private boolean running = true;
+    private Storedata lastSavedData;
 
     public static void main(String[] args) {
         new LiquorStoreSystem().run();
@@ -94,81 +90,109 @@ public class LiquorStoreSystem {
             } catch (IllegalStateException exception) {
                 System.out.println(exception.getMessage());
             }
-            saveData();
         }
         System.out.println("Programa finalizado.");
         scanner.close();
     }
 
     private boolean loadData() {
-        if (!storage.exists()) {
-            System.out.println("No hay datos guardados. Se inicia con registros vacíos.");
-            return true;
-        }
         try {
-            Storedata data = storage.load();
-            products.addAll(data.getProducts());
-            movements.addAll(data.getMovements());
-            suppliers.addAll(data.getSuppliers());
-            orders.addAll(data.getOrders());
-            sales.addAll(data.getSales());
-            customers.addAll(data.getCustomers());
-            payments.addAll(data.getPayments());
-            cashRecords.addAll(data.getCashRecords());
-            refreshCounters();
-            System.out.println("Datos cargados desde " + storage.getFilePath());
+            boolean existing = storage.exists();
+            Storedata data = existing ? storage.load() : new Storedata();
+            Storedata snapshot = storage.copy(data);
+            if (!existing) {
+                storage.save(data);
+            }
+            applyData(data);
+            lastSavedData = snapshot;
+            System.out.println(existing ? "Datos cargados desde " + storage.getFilePath()
+                    : "Se creó el archivo de datos con registros vacíos: " + storage.getFilePath());
             return true;
         } catch (IOException exception) {
-            System.out.println("No se pudo leer el archivo de datos: " + exception.getMessage());
-            try {
-                System.out.println("Se guardó una copia del archivo dañado en " + storage.backupDamagedFile());
-                System.out.println("Se inicia con registros vacíos.");
-                return true;
-            } catch (IOException backupException) {
-                System.out.println("No se pudo respaldar el archivo. Corríjalo o elimínelo e intente de nuevo.");
-                return false;
-            }
+            System.out.println("No se pudo iniciar el programa: " + exception.getMessage());
+            System.out.println("El archivo existente no fue reemplazado. Revise los datos y vuelva a intentar.");
+            return false;
         }
     }
 
-    private void saveData() {
+    private void commitChanges() {
         try {
-            storage.save(new Storedata(products, movements, suppliers, orders, sales, customers, payments, cashRecords));
+            Storedata snapshot = storage.copy(new Storedata(products, movements, suppliers,
+                    orders, sales, customers, payments, cashRecords));
+            storage.save(snapshot);
+            lastSavedData = snapshot;
         } catch (IOException exception) {
-            System.out.println("No se pudo guardar el archivo de datos: " + exception.getMessage());
+            try {
+                applyData(storage.copy(lastSavedData));
+            } catch (IOException restoreException) {
+                running = false;
+                throw new IllegalStateException("No se pudo recuperar el estado anterior. El programa se cerrará.");
+            }
+            throw new IllegalStateException("No se guardó la operación: " + exception.getMessage()
+                    + " Se restauraron los datos anteriores.");
         }
+    }
+
+    private void applyData(Storedata data) {
+        products.clear();
+        products.addAll(data.getProducts());
+        movements.clear();
+        movements.addAll(data.getMovements());
+        suppliers.clear();
+        suppliers.addAll(data.getSuppliers());
+        orders.clear();
+        orders.addAll(data.getOrders());
+        sales.clear();
+        sales.addAll(data.getSales());
+        customers.clear();
+        customers.addAll(data.getCustomers());
+        payments.clear();
+        payments.addAll(data.getPayments());
+        cashRecords.clear();
+        cashRecords.addAll(data.getCashRecords());
+        refreshCounters();
     }
 
     private void refreshCounters() {
         nextSupplierId = 1;
         for (Supplier supplier : suppliers) {
-            if (supplier.getSupplierId() >= nextSupplierId) {
-                nextSupplierId = supplier.getSupplierId() + 1;
+            if (nextSupplierId != 0 && supplier.getSupplierId() >= nextSupplierId) {
+                nextSupplierId = nextAvailableId(supplier.getSupplierId());
             }
         }
         nextOrderId = 1;
         for (PurchaseOrder order : orders) {
-            if (order.getOrderId() >= nextOrderId) {
-                nextOrderId = order.getOrderId() + 1;
+            if (nextOrderId != 0 && order.getOrderId() >= nextOrderId) {
+                nextOrderId = nextAvailableId(order.getOrderId());
             }
         }
         nextSaleId = 1;
         for (Sale sale : sales) {
-            if (sale.getSaleId() >= nextSaleId) {
-                nextSaleId = sale.getSaleId() + 1;
+            if (nextSaleId != 0 && sale.getSaleId() >= nextSaleId) {
+                nextSaleId = nextAvailableId(sale.getSaleId());
             }
         }
         nextCustomerId = 1;
         for (Customer customer : customers) {
-            if (customer.getCustomerId() >= nextCustomerId) {
-                nextCustomerId = customer.getCustomerId() + 1;
+            if (nextCustomerId != 0 && customer.getCustomerId() >= nextCustomerId) {
+                nextCustomerId = nextAvailableId(customer.getCustomerId());
             }
         }
         nextPaymentId = 1;
         for (CustomerPayment payment : payments) {
-            if (payment.getPaymentId() >= nextPaymentId) {
-                nextPaymentId = payment.getPaymentId() + 1;
+            if (nextPaymentId != 0 && payment.getPaymentId() >= nextPaymentId) {
+                nextPaymentId = nextAvailableId(payment.getPaymentId());
             }
+        }
+    }
+
+    private int nextAvailableId(int id) {
+        return id == Integer.MAX_VALUE ? 0 : id + 1;
+    }
+
+    private void requireAvailableId(int id, String records) {
+        if (id <= 0) {
+            throw new IllegalStateException("No quedan identificadores disponibles para " + records + ".");
         }
     }
 
@@ -221,7 +245,6 @@ public class LiquorStoreSystem {
                 default:
                     break;
             }
-            saveData();
         } while (option != 0 && running);
     }
 
@@ -246,6 +269,7 @@ public class LiquorStoreSystem {
         if (movement != null) {
             movements.add(movement);
         }
+        commitChanges();
         System.out.println("Producto registrado: " + product.getProductCode());
         showProductAlert(product);
     }
@@ -275,6 +299,7 @@ public class LiquorStoreSystem {
         product.updatePrices(cost, price);
         product.setMinimumStock(minimum);
         product.setName(name);
+        commitChanges();
         System.out.println("Producto actualizado. Las ventas anteriores conservan sus precios originales.");
         showProductAlert(product);
     }
@@ -297,6 +322,7 @@ public class LiquorStoreSystem {
             product.decreaseStock(quantity);
         }
         movements.add(movement);
+        commitChanges();
         System.out.println("Movimiento registrado. Stock disponible: " + product.getStock());
         showProductAlert(product);
     }
@@ -366,17 +392,18 @@ public class LiquorStoreSystem {
                 default:
                     break;
             }
-            saveData();
         } while (option != 0 && running);
     }
 
     private void registerSupplier() {
+        requireAvailableId(nextSupplierId, "proveedores");
         String name = readText("Nombre del proveedor: ");
         String contact = readText("Contacto: ");
         Supplier supplier = new Supplier(nextSupplierId, name, contact);
         if (readYesNo("¿Registrar proveedor? (s/n): ")) {
             suppliers.add(supplier);
-            nextSupplierId++;
+            nextSupplierId = nextAvailableId(nextSupplierId);
+            commitChanges();
             System.out.println("Proveedor registrado con ID " + supplier.getSupplierId());
         } else {
             System.out.println("Registro cancelado.");
@@ -394,6 +421,7 @@ public class LiquorStoreSystem {
     }
 
     private void createOrder() {
+        requireAvailableId(nextOrderId, "pedidos");
         if (suppliers.isEmpty() || products.isEmpty()) {
             System.out.println("Primero registre al menos un proveedor y un producto.");
             return;
@@ -426,7 +454,8 @@ public class LiquorStoreSystem {
         printOrder(order);
         if (readYesNo("¿Registrar este pedido pendiente? (s/n): ")) {
             orders.add(order);
-            nextOrderId++;
+            nextOrderId = nextAvailableId(nextOrderId);
+            commitChanges();
             System.out.println("Pedido registrado con ID " + order.getOrderId());
         } else {
             System.out.println("Pedido cancelado.");
@@ -471,6 +500,7 @@ public class LiquorStoreSystem {
         String date = readDate("Fecha de recepción completa");
         if (readYesNo("¿Confirma que recibió todos los productos del pedido? (s/n): ")) {
             order.receive(products, movements, date);
+            commitChanges();
             System.out.println("Pedido recibido. El inventario fue actualizado una sola vez.");
             System.out.println("Si pagó en efectivo, registre ese pago como gasto en Caja diaria.");
             showLowStockAlerts();
@@ -480,6 +510,7 @@ public class LiquorStoreSystem {
     }
 
     private void registerSale() {
+        requireAvailableId(nextSaleId, "ventas");
         if (products.isEmpty()) {
             System.out.println("Primero registre productos para poder vender.");
             return;
@@ -553,7 +584,8 @@ public class LiquorStoreSystem {
         }
         sale.complete(products, movements);
         sales.add(sale);
-        nextSaleId++;
+        nextSaleId = nextAvailableId(nextSaleId);
+        commitChanges();
         System.out.println("VENTA REGISTRADA CORRECTAMENTE");
         printSale(sale);
         if (credit) {
@@ -606,15 +638,16 @@ public class LiquorStoreSystem {
                 default:
                     break;
             }
-            saveData();
         } while (option != 0 && running);
     }
 
     private void registerCustomer() {
+        requireAvailableId(nextCustomerId, "clientes");
         Customer customer = new Customer(nextCustomerId, readText("Nombre del cliente: "));
         if (readYesNo("¿Registrar cliente? (s/n): ")) {
             customers.add(customer);
-            nextCustomerId++;
+            nextCustomerId = nextAvailableId(nextCustomerId);
+            commitChanges();
             System.out.println("Cliente registrado con ID " + customer.getCustomerId());
         } else {
             System.out.println("Registro cancelado.");
@@ -660,6 +693,7 @@ public class LiquorStoreSystem {
     }
 
     private void registerCustomerPayment() {
+        requireAvailableId(nextPaymentId, "pagos");
         Customer customer = selectCustomer();
         double balance = customer.getOutstandingBalance(sales, payments);
         System.out.printf(Locale.US, "Saldo pendiente: %.2f USD%n", balance);
@@ -678,7 +712,8 @@ public class LiquorStoreSystem {
         CustomerPayment payment = customer.createPayment(nextPaymentId, date, amount);
         if (readYesNo("¿Registrar el pago recibido? (s/n): ")) {
             customer.registerPayment(payment, sales, payments);
-            nextPaymentId++;
+            nextPaymentId = nextAvailableId(nextPaymentId);
+            commitChanges();
             System.out.printf(Locale.US, "Pago registrado. Saldo pendiente: %.2f USD%n", customer.getOutstandingBalance(sales, payments));
         } else {
             System.out.println("Pago cancelado.");
@@ -715,7 +750,6 @@ public class LiquorStoreSystem {
                 default:
                     break;
             }
-            saveData();
         } while (option != 0 && running);
     }
 
@@ -728,6 +762,7 @@ public class LiquorStoreSystem {
         DailyCashRecord record = new DailyCashRecord(date, opening);
         if (readYesNo("¿Registrar apertura? (s/n): ")) {
             cashRecords.add(record);
+            commitChanges();
             System.out.println("Apertura de caja registrada para " + date);
         } else {
             System.out.println("Apertura cancelada.");
@@ -740,6 +775,7 @@ public class LiquorStoreSystem {
         double amount = readMoney("Monto pagado en efectivo (USD): ", false);
         if (readYesNo("¿Registrar gasto? (s/n): ")) {
             record.addExpense(description, amount);
+            commitChanges();
             System.out.printf(Locale.US, "Gasto registrado. Total de gastos del día: %.2f USD%n", record.getTotalExpenses());
         } else {
             System.out.println("Gasto cancelado.");
@@ -751,6 +787,8 @@ public class LiquorStoreSystem {
         double amount = readMoney("Dinero contado físicamente (USD): ", true);
         if (readYesNo("¿Guardar este conteo? (s/n): ")) {
             record.recordCount(amount);
+            commitChanges();
+            System.out.println("Conteo guardado correctamente.");
             showCashReport(record);
         } else {
             System.out.println("Conteo cancelado.");
@@ -910,8 +948,11 @@ public class LiquorStoreSystem {
         for (Product product : products) {
             movements.add(product.createStockMovement(nextMovementId(), date, "ENTRY", product.getStock()));
         }
-        suppliers.add(new Supplier(nextSupplierId++, "Proveedor de demostración", "Contacto de demostración"));
-        customers.add(new Customer(nextCustomerId++, "Cliente de demostración"));
+        suppliers.add(new Supplier(nextSupplierId, "Proveedor de demostración", "Contacto de demostración"));
+        nextSupplierId = nextAvailableId(nextSupplierId);
+        customers.add(new Customer(nextCustomerId, "Cliente de demostración"));
+        nextCustomerId = nextAvailableId(nextCustomerId);
+        commitChanges();
         System.out.println("Datos ficticios cargados. Cliente ID 1 y proveedor ID 1.");
         showProducts();
         showLowStockAlerts();

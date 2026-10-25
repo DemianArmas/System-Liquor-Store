@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class Product {
-    private final String productCode;
+    private String productCode;
     private String name;
     private double purchaseCost;
     private double sellingPrice;

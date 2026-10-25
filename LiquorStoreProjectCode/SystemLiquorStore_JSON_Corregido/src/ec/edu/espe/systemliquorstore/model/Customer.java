@@ -4,7 +4,7 @@ import ec.edu.espe.systemliquorstore.util.Validation;
 import java.util.ArrayList;
 
 public class Customer {
-    private final int customerId;
+    private int customerId;
     private String name;
     private static final Validation validation = new Validation();
 

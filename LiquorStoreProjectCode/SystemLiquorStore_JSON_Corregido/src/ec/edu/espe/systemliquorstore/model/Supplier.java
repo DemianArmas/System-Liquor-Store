@@ -3,7 +3,7 @@ package ec.edu.espe.systemliquorstore.model;
 import ec.edu.espe.systemliquorstore.util.Validation;
 
 public class Supplier {
-    private final int supplierId;
+    private int supplierId;
     private String name;
     private String contact;
     private static final Validation validation = new Validation();

@@ -3,8 +3,8 @@ package ec.edu.espe.systemliquorstore.model;
 import ec.edu.espe.systemliquorstore.util.Validation;
 
 public class CashExpense {
-    private final String description;
-    private final double amount;
+    private String description;
+    private double amount;
     private static final Validation validation = new Validation();
 
     public CashExpense(String description, double amount) {

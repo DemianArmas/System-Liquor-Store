@@ -3,10 +3,10 @@ package ec.edu.espe.systemliquorstore.model;
 import ec.edu.espe.systemliquorstore.util.Validation;
 
 public class CustomerPayment {
-    private final int paymentId;
-    private final int customerId;
-    private final String date;
-    private final double amount;
+    private int paymentId;
+    private int customerId;
+    private String date;
+    private double amount;
     private static final Validation validation = new Validation();
 
     public CustomerPayment(int paymentId, int customerId, String date, double amount) {

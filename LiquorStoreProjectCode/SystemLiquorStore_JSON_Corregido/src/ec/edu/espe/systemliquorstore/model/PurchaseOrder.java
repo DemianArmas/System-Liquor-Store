@@ -4,12 +4,12 @@ import ec.edu.espe.systemliquorstore.util.Validation;
 import java.util.ArrayList;
 
 public class PurchaseOrder {
-    private final int orderId;
-    private final int supplierId;
-    private final String orderDate;
+    private int orderId;
+    private int supplierId;
+    private String orderDate;
     private String status;
     private String receivedDate;
-    private final ArrayList<PurchaseOrderItem> items;
+    private ArrayList<PurchaseOrderItem> items;
     private static final Validation validation = new Validation();
 
     public PurchaseOrder(int orderId, int supplierId, String orderDate) {

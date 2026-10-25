@@ -6,12 +6,12 @@ import java.util.Locale;
 import java.time.LocalDate;
 
 public class Sale {
-    private final int saleId;
-    private final String date;
-    private final String seller;
-    private final String paymentType;
+    private int saleId;
+    private String date;
+    private String seller;
+    private String paymentType;
     private int customerId;
-    private final ArrayList<SaleItem> items;
+    private ArrayList<SaleItem> items;
     private double subtotal;
     private double discountPercentage;
     private double discountAmount;

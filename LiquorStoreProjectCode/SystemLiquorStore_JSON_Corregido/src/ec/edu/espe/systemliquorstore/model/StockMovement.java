@@ -4,11 +4,11 @@ import ec.edu.espe.systemliquorstore.util.Validation;
 import java.util.Locale;
 
 public class StockMovement {
-    private final int movementId;
-    private final String date;
-    private final String productCode;
-    private final String movementType;
-    private final int quantity;
+    private int movementId;
+    private String date;
+    private String productCode;
+    private String movementType;
+    private int quantity;
     private static final Validation validation = new Validation();
 
     public StockMovement(int movementId, String date, String productCode,

@@ -4,11 +4,11 @@ import ec.edu.espe.systemliquorstore.util.Validation;
 import java.util.Locale;
 
 public class SaleItem {
-    private final String productCode;
-    private final String productName;
-    private final int quantity;
-    private final double unitPurchaseCost;
-    private final double unitSellingPrice;
+    private String productCode;
+    private String productName;
+    private int quantity;
+    private double unitPurchaseCost;
+    private double unitSellingPrice;
     private static final Validation validation = new Validation();
 
     public SaleItem(String productCode, String productName, int quantity,

@@ -4,11 +4,11 @@ import ec.edu.espe.systemliquorstore.util.Validation;
 import java.util.ArrayList;
 
 public class DailyCashRecord {
-    private final String date;
-    private final double openingCash;
+    private String date;
+    private double openingCash;
     private double countedCash;
     private boolean cashCountRecorded;
-    private final ArrayList<CashExpense> expenses;
+    private ArrayList<CashExpense> expenses;
     private static final Validation validation = new Validation();
 
     public DailyCashRecord(String date, double openingCash) {
