@@ -1,46 +1,54 @@
 package ec.edu.espe.systemliquorstore.model;
 
-/**
- *
- * @author Demian Armas, Logical Lords, @ESPE
- */
+import ec.edu.espe.systemliquorstore.util.Validation;
+
 public class Supplier {
+    private final int supplierId;
+    private String name;
+    private String contact;
+    private final Validation validation = new Validation();
 
-    private int supplierId;
-    private String companyName;
-
-    public Supplier(int supplierId, String companyName) {
+    public Supplier(int supplierId, String name, String contact) {
         this.supplierId = supplierId;
-        this.companyName = companyName;
+        this.name = name == null ? "" : name.trim();
+        this.contact = contact == null ? "" : contact.trim();
+        if (this.supplierId <= 0 || !validation.isText(this.name)
+                || !validation.isText(this.contact)) {
+            throw new IllegalArgumentException("Revise el identificador, nombre y contacto del proveedor.");
+        }
     }
 
-    public void receiveOrder() {
-        System.out.println(companyName + " recibio un nuevo pedido.");
+    public PurchaseOrder createPurchaseOrder(int id, String date) {
+        return new PurchaseOrder(id, supplierId, date);
     }
 
-    public void deliverStock() {
-        System.out.println(companyName + " esta entregando la mercaderia.");
-    }
-
-    @Override
-    public String toString() {
-        return "Supplier{supplierId=" + supplierId + ", companyName=" + companyName + '}';
+    public boolean isValid() {
+        return supplierId > 0 && validation.isText(name) && validation.isText(contact);
     }
 
     public int getSupplierId() {
         return supplierId;
     }
 
-    public void setSupplierId(int supplierId) {
-        this.supplierId = supplierId;
+    public String getName() {
+        return name;
     }
 
-    public String getCompanyName() {
-        return companyName;
+    public void setName(String name) {
+        if (!validation.isText(name)) {
+            throw new IllegalArgumentException("El nombre del proveedor no puede estar vacio.");
+        }
+        this.name = name.trim();
     }
 
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
+    public String getContact() {
+        return contact;
     }
 
+    public void setContact(String contact) {
+        if (!validation.isText(contact)) {
+            throw new IllegalArgumentException("El contacto del proveedor no puede estar vacio.");
+        }
+        this.contact = contact.trim();
+    }
 }
