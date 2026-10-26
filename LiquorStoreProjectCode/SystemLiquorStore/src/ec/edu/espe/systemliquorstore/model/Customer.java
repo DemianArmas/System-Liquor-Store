@@ -54,7 +54,7 @@ public class Customer {
                 }
             }
         }
-        double balance = validation.roundMoney(creditSales - paidAmount);
+        double balance = validation.roundMoney(creditSales + paidAmount);
         if (balance < 0) {
             throw new IllegalStateException("Los pagos registrados superan la deuda del cliente.");
         }

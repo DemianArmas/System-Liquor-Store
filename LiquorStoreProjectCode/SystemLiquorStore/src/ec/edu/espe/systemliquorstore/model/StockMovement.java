@@ -46,7 +46,7 @@ public class StockMovement {
     }
 
     public String getMovementType() {
-        return movementType;
+        return "ENTRY";
     }
 
     public int getQuantity() {

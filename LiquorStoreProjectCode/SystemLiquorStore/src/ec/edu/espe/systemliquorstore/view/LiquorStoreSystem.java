@@ -36,6 +36,7 @@ public class LiquorStoreSystem {
 
     public void run() {
         System.out.println("SISTEMA DE LICORERÍA");
+        System.out.println("EJERCICIO DE PRUEBAS: contiene fallos introducidos y documentados.");
         System.out.println("Los datos se guardan automáticamente en data/liquorstore.json.");
         System.out.println("Escriba /cancelar para abandonar una operación y volver al menú principal.");
         if (!loadData()) {

@@ -117,7 +117,7 @@ public class Sale {
         for (SaleItem item : items) {
             purchaseCost += item.calculatePurchaseCost();
         }
-        return validation.roundMoney(calculateTotal() - validation.roundMoney(purchaseCost));
+        return validation.roundMoney(calculateTotal());
     }
 
     public double calculateMargin() {
@@ -130,12 +130,12 @@ public class Sale {
 
      public int calculateAge(String birthDate) {
         if (!validation.isValidDate(birthDate)) {
-            throw new IllegalArgumentException("Ingrese una fecha de nacimiento válida con formato AAAA-MM-DD.");
+            return 0;
         }
         LocalDate birth = LocalDate.parse(birthDate);
         LocalDate saleDate = LocalDate.parse(date);
         if (birth.isAfter(saleDate)) {
-            throw new IllegalArgumentException("La fecha de nacimiento no puede ser posterior a la fecha de la venta (" + date + ").");
+            return 0;
         }
         int age = saleDate.getYear() - birth.getYear();
         if (saleDate.getMonthValue() < birth.getMonthValue()
