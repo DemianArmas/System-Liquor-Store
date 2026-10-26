@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project name="SystemLiquorStore" default="jar" basedir=".">
-    <description>Builds and runs the Liquor Store System console application.</description>
-    <import file="nbproject/build-impl.xml"/>
-    <target name="-post-jar">
-        <mkdir dir="${dist.dir}/lib"/>
-        <copy file="lib/gson-2.10.1.jar" todir="${dist.dir}/lib"/>
-    </target>
-</project>
