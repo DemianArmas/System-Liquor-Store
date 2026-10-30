@@ -4,7 +4,10 @@ import com.google.gson.annotations.SerializedName;
 import ec.edu.espe.systemliquorstore.util.Validation;
 import ec.edu.espe.systemliquorstore.exception.BusinessRuleException;
 import java.util.ArrayList;
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class PurchaseOrder {
     @SerializedName("idPedido")
     private int orderId;

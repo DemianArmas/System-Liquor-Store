@@ -3,7 +3,10 @@ package ec.edu.espe.systemliquorstore.model;
 import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.Locale;
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class StoreData {
     @SerializedName("productos")
     private ArrayList<Product> products;

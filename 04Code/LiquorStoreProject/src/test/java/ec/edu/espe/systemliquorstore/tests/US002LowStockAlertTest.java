@@ -7,7 +7,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class US002LowStockAlertTest {
 
     private Product createProduct(int stock, int minimumStock) {

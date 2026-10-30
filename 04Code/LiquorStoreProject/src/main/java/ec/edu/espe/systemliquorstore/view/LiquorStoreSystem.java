@@ -12,7 +12,10 @@ import java.time.LocalDate;
 import java.util.ArrayList; 
 import java.util.Locale; 
 import java.util.Scanner; 
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class LiquorStoreSystem { 
     private final Scanner scanner = new Scanner(System.in, "UTF-8"); 
     private final JsonStorage storage; 

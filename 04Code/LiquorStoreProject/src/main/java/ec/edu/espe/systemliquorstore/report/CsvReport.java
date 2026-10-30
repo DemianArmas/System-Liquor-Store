@@ -9,7 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class CsvReport {
     private final Path directory;
 

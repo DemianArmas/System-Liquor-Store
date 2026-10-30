@@ -4,7 +4,10 @@ import ec.edu.espe.systemliquorstore.model.Product;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import org.junit.Test;
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class US001ProductsInventoryTest {
 
     private Product createProduct() {
@@ -71,7 +74,7 @@ public class US001ProductsInventoryTest {
 
     @Test
     public void testUS001Case09SellingPriceBelowCostIsAllowed() {
-        // A sale can produce a loss; the profit report must show that loss.
+        
         Product product = new Product("WHI01", "Whisky", 20.00, 10.00, 5, 2);
         assertEquals(20.00, product.getPurchaseCost(), 0.001);
         assertEquals(10.00, product.getSellingPrice(), 0.001);

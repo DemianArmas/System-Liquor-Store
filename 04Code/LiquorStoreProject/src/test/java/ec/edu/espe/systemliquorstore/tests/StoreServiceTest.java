@@ -5,7 +5,10 @@ import ec.edu.espe.systemliquorstore.model.*;
 import ec.edu.espe.systemliquorstore.service.StoreService;
 import org.junit.Test;
 import static org.junit.Assert.*;
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class StoreServiceTest {
     @Test
     public void productCrud() {

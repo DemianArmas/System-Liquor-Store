@@ -7,7 +7,10 @@ import ec.edu.espe.systemliquorstore.model.StockMovement;
 import java.util.ArrayList; 
 import org.junit.Test; 
 import static org.junit.Assert.*; 
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class US004SalesTest { 
     @Test 
     public void testSale1() { 

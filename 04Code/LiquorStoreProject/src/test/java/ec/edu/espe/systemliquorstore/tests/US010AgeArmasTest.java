@@ -3,7 +3,10 @@ package ec.edu.espe.systemliquorstore.tests;
 import ec.edu.espe.systemliquorstore.model.Sale;
 import org.junit.Test;
 import static org.junit.Assert.*;
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class US010AgeArmasTest {
     @Test
     public void testAge5() {

@@ -9,7 +9,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 /**
  *
- * @author Enrique Ayala, Logical Lords, @ESPE
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
  */
 
 public class US003SupplierOrderTest {

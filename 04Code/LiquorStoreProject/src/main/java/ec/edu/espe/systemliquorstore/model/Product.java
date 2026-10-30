@@ -4,7 +4,10 @@ import com.google.gson.annotations.SerializedName;
 import ec.edu.espe.systemliquorstore.util.Validation;
 import java.util.ArrayList;
 import java.util.Locale;
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class Product {
     @SerializedName("codigoProducto")
     private String productCode;

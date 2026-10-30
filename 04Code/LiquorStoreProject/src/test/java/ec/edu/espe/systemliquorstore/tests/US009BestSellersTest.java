@@ -5,7 +5,10 @@ import ec.edu.espe.systemliquorstore.model.Sale;
 import java.util.ArrayList; 
 import org.junit.Test; 
 import static org.junit.Assert.*; 
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class US009BestSellersTest { 
     @Test 
     public void testBestSellers1() { 
@@ -52,7 +55,7 @@ public class US009BestSellersTest {
         sale.complete(products, new ArrayList<>()); 
         sales.add(sale); 
         int sold = product.getUnitsSold(sales, "2026-10-01", "2026-10-31"); 
-        assertEquals(5, sold); // Error del estudiante, asume que está en el rango
+        assertEquals(5, sold); 
     } 
     
     @Test 
@@ -101,15 +104,14 @@ public class US009BestSellersTest {
         sale.addProduct(product, 5); 
         sales.add(sale); 
         int sold = product.getUnitsSold(sales, "2026-10-01", "2026-10-31"); 
-        assertEquals(5, sold); // Error de alumno, asume que la venta no completa sí suma
+        assertEquals(5, sold); 
     } 
     
     @Test 
     public void testBestSellers7() { 
         System.out.println("invalidDateRange"); 
         Product product = new Product("P001", "Cerveza", 5.0, 10.0, 50, 10); 
-        ArrayList<Sale> sales = new ArrayList<>(); 
-        // Estudiante quitó Try-Catch
+        ArrayList<Sale> sales = new ArrayList<>();
         product.getUnitsSold(sales, "2026-10-31", "2026-10-01"); 
     } 
     
@@ -117,8 +119,7 @@ public class US009BestSellersTest {
     public void testBestSellers8() { 
         System.out.println("invalidDateFormat"); 
         Product product = new Product("P001", "Cerveza", 5.0, 10.0, 50, 10); 
-        ArrayList<Sale> sales = new ArrayList<>(); 
-        // Estudiante quitó Try-Catch
+        ArrayList<Sale> sales = new ArrayList<>();
         product.getUnitsSold(sales, "invalid-date", "2026-10-31"); 
     } 
     
@@ -142,8 +143,7 @@ public class US009BestSellersTest {
     @Test 
     public void testBestSellers10() { 
         System.out.println("nullSalesList"); 
-        Product product = new Product("P001", "Cerveza", 5.0, 10.0, 50, 10); 
-        // Estudiante quitó Try-Catch
+        Product product = new Product("P001", "Cerveza", 5.0, 10.0, 50, 10);
         product.getUnitsSold(null, "2026-10-01", "2026-10-31"); 
     } 
 }

@@ -6,7 +6,10 @@ import ec.edu.espe.systemliquorstore.exception.BusinessRuleException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.time.LocalDate;
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class Sale {
     @SerializedName("idVenta")
     private int saleId;

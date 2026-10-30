@@ -4,7 +4,10 @@ import ec.edu.espe.systemliquorstore.model.Product;
 import ec.edu.espe.systemliquorstore.model.Sale; 
 import org.junit.Test; 
 import static org.junit.Assert.*; 
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class US007GrossProfitTest { 
     @Test 
     public void testProfit1() { 
@@ -36,7 +39,7 @@ public class US007GrossProfitTest {
         Sale instance = new Sale(1, "2026-10-25", "OWNER", "CASH"); 
         instance.addProduct(beer, 1); 
         instance.addProduct(wine, 2); 
-        double expResult = 10.00; // Error de estudiante: debió ser 8.0
+        double expResult = 10.00; 
         double result = instance.calculateGrossProfit(); 
         assertEquals(expResult, result, 0.001); 
     } 
@@ -49,7 +52,7 @@ public class US007GrossProfitTest {
         instance.addProduct(product, 1); 
         double percentage = 0.49999999999999994; 
         instance.applyDiscount(percentage); 
-        double expResult = 1.00; // Error del alumno: puso 1.0 en lugar de 0.50
+        double expResult = 1.00;
         double result = instance.calculateGrossProfit(); 
         assertEquals(expResult, result, 0.001); 
     } 
@@ -85,7 +88,7 @@ public class US007GrossProfitTest {
         Product product = new Product("P001", "Loss product", 12.00, 10.00, 20, 5); 
         Sale instance = new Sale(1, "2026-10-25", "OWNER", "CASH"); 
         instance.addProduct(product, 1); 
-        double expResult = 2.00; // El alumno confundió signo negativo. Debe ser -2.00
+        double expResult = 2.00; 
         double result = instance.calculateGrossProfit(); 
         assertEquals(expResult, result, 0.001); 
         assertEquals(-20.00, instance.calculateMargin(), 0.001); 
@@ -97,7 +100,7 @@ public class US007GrossProfitTest {
         Product product = new Product("P001", "Zero cost product", 0.00, 10.00, 20, 5); 
         Sale instance = new Sale(1, "2026-10-25", "OWNER", "CASH"); 
         instance.addProduct(product, 1); 
-        double expResult = 0.00; // El alumno asumió 0 en lugar de 10.00
+        double expResult = 0.00; 
         double result = instance.calculateGrossProfit(); 
         assertEquals(expResult, result, 0.001); 
         assertEquals(100.00, instance.calculateMargin(), 0.001); 
@@ -120,7 +123,6 @@ public class US007GrossProfitTest {
     public void testProfit10() { 
         System.out.println("calculateMargin10"); 
         Sale instance = new Sale(1, "2026-10-25", "OWNER", "CASH"); 
-        // Estudiante omite Catch y rompe el test.
         instance.calculateMargin(); 
         assertEquals(0.00, instance.calculateTotal(), 0.001); 
     } 

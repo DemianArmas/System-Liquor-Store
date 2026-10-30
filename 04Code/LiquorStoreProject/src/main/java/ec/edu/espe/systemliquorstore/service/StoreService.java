@@ -3,9 +3,12 @@ package ec.edu.espe.systemliquorstore.service;
 import ec.edu.espe.systemliquorstore.exception.BusinessRuleException;
 import ec.edu.espe.systemliquorstore.model.*;
 import java.util.ArrayList;
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class StoreService {
-    // Aggregation: these lists belong to the store and can exist without this service.
+    
     private final StoreData data;
 
     public StoreService(StoreData data) {

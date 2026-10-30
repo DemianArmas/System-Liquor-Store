@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author Enrique Ayala, Logical Lords, @ESPE
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
  */
 public class US008DiscountTest {
     @Test public void testDiscount1() {
@@ -73,8 +73,7 @@ public class US008DiscountTest {
         Product product = new Product("P001", "Vino", 10.0, 20.0, 20, 5);
         Sale sale = new Sale(1, "2026-10-25", "OWNER", "CASH");
         sale.addProduct(product, 1); 
-        sale.applyDiscount(10.0); 
-        // Revenue is 18, cost is 10: 8 / 18 * 100 = 44.44 percent.
+        sale.applyDiscount(10.0);
         assertEquals(44.44, sale.calculateMargin(), 0.001);
     }
 

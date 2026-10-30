@@ -2,7 +2,10 @@ package ec.edu.espe.systemliquorstore.util;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public final class Validation {
     private Validation() {
     }

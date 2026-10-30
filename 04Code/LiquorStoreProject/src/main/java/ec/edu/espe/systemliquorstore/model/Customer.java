@@ -3,7 +3,10 @@ package ec.edu.espe.systemliquorstore.model;
 import com.google.gson.annotations.SerializedName;
 import ec.edu.espe.systemliquorstore.util.Validation;
 import java.util.ArrayList;
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class Customer {
     @SerializedName("idCliente")
     private int customerId;

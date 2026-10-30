@@ -1,1 +1,6 @@
-[]
+[
+  {
+    "idCliente": 1,
+    "nombre": "Maria"
+  }
+]

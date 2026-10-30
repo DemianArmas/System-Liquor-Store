@@ -12,7 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class JsonStorage {
     private final Path directory;
     private final Gson gson;
@@ -73,7 +76,7 @@ public class JsonStorage {
         int replaced = 0;
         try {
             Files.createDirectories(directory);
-            // Prepare all files before replacing the saved information.
+            
             for (int i = 0; i < FILE_NAMES.length; i++) {
                 Path file = directory.resolve(FILE_NAMES[i]);
                 if (Files.exists(file)) {
@@ -107,7 +110,7 @@ public class JsonStorage {
                     try {
                         Files.deleteIfExists(file);
                     } catch (IOException exception) {
-                        // A temporary file never replaces a data file on startup.
+                       
                     }
                 }
             }
@@ -129,7 +132,7 @@ public class JsonStorage {
         }
     }
 
-    // Translate system labels; names are kept exactly as the owner entered them.
+    
     private void translateValues(JsonElement element, boolean toSpanish) {
         if (element.isJsonArray()) {
             for (JsonElement item : element.getAsJsonArray()) {

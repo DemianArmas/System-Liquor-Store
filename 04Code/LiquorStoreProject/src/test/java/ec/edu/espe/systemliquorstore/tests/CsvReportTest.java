@@ -10,7 +10,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.*;
-
+/**
+ *
+ * @author Isaac Acurio, Demian Armas, Enrique Ayala, Logical Lords, @ESPE
+ */
 public class CsvReportTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
